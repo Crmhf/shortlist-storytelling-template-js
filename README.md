@@ -9,6 +9,7 @@ This repository contains the application files for the "Shortlist" story map app
 ## Features
 * You can organize your POIs by theme; for example, Food, Hotels, and Attractions. 
 * As users pan and zoom, the app presents POIs only for the current map extent.
+* 在新的版本里面讲解决不是读取Portal for ArcGIS的问题呢
 
 ## Instructions
 
