@@ -874,7 +874,7 @@ function buildPopup(feature, geometry, baseLayerClick)
 	var picture = atts.getValueCI(FIELDNAME_IMAGEURL);
 	var website = atts.getValueCI(FIELDNAME_WEBSITE);
 	
-	var contentDiv = $("<div></div");
+	var contentDiv = $("<div></div>");
 	if (baseLayerClick && mobile)
 			$('#mobileSupportedLayersView').append($("<div style='padding-left: 20px;' class='mobileFeatureTitle'></div>").html(title));
 	if (shortDesc) {
@@ -1382,6 +1382,7 @@ function shareTwitter()
 	);
 }
 
+// 短链接
 function requestBitly()
 {
 	var bitlyUrls = [
