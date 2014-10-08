@@ -47,8 +47,17 @@ var version = '1.3';
 /******************************************************
 ********************  config section ******************
 *******************************************************/
-// var WEBMAP_ID = "a3818daff32940f18d01d2a059146b7c";
-var WEBMAP_ID = "1966ef409a344d089b001df85332608f";
+//  ON_PORTAL 为 true,使用Portal for ArcGIS,需要指定DEFAULT_SHARING_URL+DEFAULT_PROXY_URL
+//  ON_PORTAL 为 false,使用ArcGIS Online,需要注释DEFAULT_SHARING_URL+DEFAULT_PROXY_URL
+var ON_PORTAL = true;  //If set to true, set the URL in the next two links to your server
+var DEFAULT_SHARING_URL = "http://esri-705.arcgiscloud.com/arcgis/sharing/content/items";
+var DEFAULT_PROXY_URL = "http://esri-705.arcgiscloud.com/arcgis/sharing/proxy";
+
+var WEBMAP_ID = "3faa66268b51408db8d1ff2d0bea1232";
+// ArcGIS Online
+// var WEBMAP_ID = "1966ef409a344d089b001df85332608f";
+// Portal for ArcGIS
+// var WEBMAP_ID = "3faa66268b51408db8d1ff2d0bea1232";
 var BOOKMARKS_ALIAS = "缩放至";
 var COLOR_ORDER = "purple,green,red,blue"; // will only use as many colors as you have tabs
 var DETAILS_PANEL = false;  // specifies whether or not popups have a link to a separate Details panel
