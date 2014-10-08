@@ -1,4 +1,8 @@
+//
 dojo.require("esri.arcgis.utils");
+dojo.require("esri.config");
+//
+dojo.require("esri.map");
 
 var COLOR_SCHEMES = [
 					{name:"blue",iconDir:"blue",iconPrefix:"NumberIconb",color:"#177ff1"},
@@ -142,7 +146,18 @@ function init() {
 		}
 		$("#mobileBookmarksDiv").slideToggle();
 	});
-			
+
+    // 新增加载本地PORTAL的功能
+        if (ON_PORTAL) {
+               esri.arcgis.utils.arcgisUrl = DEFAULT_SHARING_URL;
+               esri.config.defaults.io.proxyurl = DEFAULT_PROXY_URL;
+            }
+    	if (window.DEFAULT_SHARING_URL)
+        	   esri.arcgis.utils.arcgisUrl = DEFAULT_SHARING_URL;
+
+        if (window.DEFAULT_PROXY_URL)
+        	   esri.config.defaults.io.proxyurl = DEFAULT_PROXY_URL;
+
 	var mapDeferred = esri.arcgis.utils.createMap(WEBMAP_ID, "map", {
 		mapOptions: {
 			slider: false,
@@ -150,8 +165,17 @@ function init() {
 		},
 		ignorePopups: true
 	});
-	
+    /*var map;
+    require(["esri/map", "dojo/domReady!"], function(Map) {
+        map = new Map("map", {
+            basemap: "topo",
+            center: [-122.45, 37.75], // longitude, latitude
+            zoom: 13
+        });
+    });*/
+
 	mapDeferred.addCallback(function(response) {
+
 		var title = response.itemInfo.item.title;
 		var subtitle = response.itemInfo.item.snippet;
 		
@@ -379,10 +403,10 @@ function initMap(layers) {
 	else {
 		$(".tab").css("display", "none");
 		$('#mobileThemeBar .swiper-container').css('display', 'none');
-		$('#mobileTitlePage').append("<br><hr></hr>")
-		$('#mobileTitlePage').append('<ul id="mobileThemeList" class="mobileTileList">')
-		var introList = $('<li class="mobileTitleTheme" onclick="selectMobileTheme(' + 0 + ')">').append('<div class="startButton"> Start </div>')
-		$('#mobileThemeList').append(introList)
+		$('#mobileTitlePage').append("<br><hr />");
+		$('#mobileTitlePage').append('<ul id="mobileThemeList" class="mobileTileList">');
+		var introList = $('<li class="mobileTitleTheme" onclick="selectMobileTheme(' + 0 + ')">').append('<div class="startButton"> Start </div>');
+		$('#mobileThemeList').append(introList);
 	}
 
 	_mobileThemeSwiper.enableKeyboardControl();
@@ -932,15 +956,15 @@ function buildPopup(feature, geometry, baseLayerClick)
 			if(baseLayerClick)
 				$('#mobileSupportedLayersView').append($("<div class='mobileFeatureDesc'></div>").html(desc1));
 		}
-		
+	// 修改网站链接的描述问中文
 		if (website) {
 			website = website.toLowerCase();
 			if (!(website.indexOf("http") >= 0)) {
 				website = "http://"+website;
 			}
-			$(contentDiv).append($('<div class="address"><a href="'+website+'" target="_blank">Website</a></div>').css("padding-top", 10));
+			$(contentDiv).append($('<div class="address"><a href="'+website+'" target="_blank">网站地址</a></div>').css("padding-top", 10));
 			if(baseLayerClick && mobile)
-				$('#mobileSupportedLayersView').append($('<div class="mobileFeatureAddress"><a href="'+website+'" target="_blank">Website</a></div>').css("padding-top", 10));
+				$('#mobileSupportedLayersView').append($('<div class="mobileFeatureAddress"><a href="'+website+'" target="_blank">网站地址</a></div>').css("padding-top", 10));
 		}
 		
 	}
