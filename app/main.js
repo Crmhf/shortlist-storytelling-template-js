@@ -152,7 +152,7 @@ function init() {
                esri.arcgis.utils.arcgisUrl = DEFAULT_SHARING_URL;
                esri.config.defaults.io.proxyurl = DEFAULT_PROXY_URL;
             }
-    	if (window.DEFAULT_SHARING_URL)
+     	if (window.DEFAULT_SHARING_URL)
         	   esri.arcgis.utils.arcgisUrl = DEFAULT_SHARING_URL;
 
         if (window.DEFAULT_PROXY_URL)
