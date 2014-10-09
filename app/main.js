@@ -1,8 +1,6 @@
 //
 dojo.require("esri.arcgis.utils");
 dojo.require("esri.config");
-//
-dojo.require("esri.map");
 
 var COLOR_SCHEMES = [
 					{name:"blue",iconDir:"blue",iconPrefix:"NumberIconb",color:"#177ff1"},
@@ -77,10 +75,10 @@ jQuery(document).ready(function() {_jqueryReady = true;init()});
    createMap. */
 
 function init() {
-	
+
 	if (!_jqueryReady) return;
 	if (!_dojoReady) return;
-	
+
 	var queryString = new Object();
 	var temp = esri.urlToObject(document.location.href).query;
 	if (temp) {
@@ -93,8 +91,8 @@ function init() {
 	BOOKMARKS_ALIAS = queryString["bookmarks_alias"] ? queryString["bookmarks_alias"] : BOOKMARKS_ALIAS;
 	COLOR_ORDER = queryString["color_order"] ? queryString["color_order"] : COLOR_ORDER;
 	DETAILS_PANEL = queryString["details_panel"] ? $.trim((queryString["details_panel"])).toLowerCase() == "true" : DETAILS_PANEL;
-	POINT_LAYERS_NOT_TO_BE_SHOWN_AS_TABS = queryString["point_layers_not_to_be_shown_as_tabs"] ? 
-											queryString["point_layers_not_to_be_shown_as_tabs"] : 
+	POINT_LAYERS_NOT_TO_BE_SHOWN_AS_TABS = queryString["point_layers_not_to_be_shown_as_tabs"] ?
+											queryString["point_layers_not_to_be_shown_as_tabs"] :
 											POINT_LAYERS_NOT_TO_BE_SHOWN_AS_TABS;
 	SUPPORTING_LAYERS_THAT_ARE_CLICKABLE = queryString["supporting_layers_that_are_clickable"] ?
 											queryString["supporting_layers_that_are_clickable"] :
@@ -102,14 +100,14 @@ function init() {
 	GEOLOCATOR = queryString["geolocator"] ? queryString["geolocator"] : GEOLOCATOR;
 	// Note:  If using a proxy server (required for remove CSV access),
 	//        you'll need to uncomment the following line and provide
-	//        a valid proxy server url. 										
+	//        a valid proxy server url.
 	//esri.config.defaults.io.proxyUrl = YOUR_PROXY_URL_HERE;
-	
+
 	$("#bookmarksTogText").html(BOOKMARKS_ALIAS+' &#x25BC;');
 
-	handleWindowResize();	
-	$(this).resize(handleWindowResize);	
-	
+	handleWindowResize();
+	$(this).resize(handleWindowResize);
+
 	$("#zoomIn").click(function(e) {
         _map.setLevel(_map.getLevel()+1);
 		hideBookmarks();
@@ -121,12 +119,12 @@ function init() {
 	$("#zoomExtent").click(function(e) {
         _map.setExtent(_initExtent);
 		hideBookmarks();
-    });	
-	
+    });
+
 	$(document).bind('cbox_complete', function(){
 		$(".details .rightDiv").height($(".details").height() - $(".details .title").height() - 40);
-	});  
-	
+	});
+
 	$("#bookmarksToggle").click(function(){
 		if ($("#bookmarksDiv").css('display')=='none'){
 		  $("#bookmarksTogText").html(BOOKMARKS_ALIAS+' &#x25B2;');
@@ -147,6 +145,7 @@ function init() {
 		$("#mobileBookmarksDiv").slideToggle();
 	});
 
+//region 数据读取是否来自Portal
     // 新增加载本地PORTAL的功能
         if (ON_PORTAL) {
                esri.arcgis.utils.arcgisUrl = DEFAULT_SHARING_URL;
@@ -157,8 +156,44 @@ function init() {
 
         if (window.DEFAULT_PROXY_URL)
         	   esri.config.defaults.io.proxyurl = DEFAULT_PROXY_URL;
+//endregion
 
-	var mapDeferred = esri.arcgis.utils.createMap(WEBMAP_ID, "map", {
+//region webmap
+    var webmap = {};
+    webmap.item = {
+        "title":"Soil Survey Map of USA",
+        "snippet": "This map shows the Soil Survey Geographic (SSURGO) by the United States Department of Agriculture's Natural Resources Conservation Service."
+    };
+
+	webmap.itemData = {
+		operationalLayers: [
+			{
+				url: "http://server.arcgisonline.com/ArcGIS/rest/services/Demographics/USA_Median_Age/MapServer",
+				id: "USA_Median_Age_6919",
+				visibility: true,
+				opacity: 0.56,
+				title: "USA Median Age",
+				itemId: "1966ef409a344d089b001df85332608f"
+			}
+		],
+		baseMap: {
+			baseMapLayers: [
+				{
+					id: "World_Light_Gray_Base_7935",
+					layerType: "ArcGISTiledMapServiceLayer",
+					opacity: 1,
+					visibility: true,
+					url: "http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer"
+				}
+			],
+			title: "Light Gray Canvas"
+		},
+		version: "2.0"
+	}
+    var webmap2 = "1966ef409a344d089b001df85332608f";
+//endregion
+
+	var mapDeferred = esri.arcgis.utils.createMap(webmap2, "map", {
 		mapOptions: {
 			slider: false,
 			wrapAround180:false
@@ -178,21 +213,21 @@ function init() {
 
 		var title = response.itemInfo.item.title;
 		var subtitle = response.itemInfo.item.snippet;
-		
+
 		document.title = title;
 		$("#title").html(title);
 		$("#subtitle").html(subtitle);
-		
-		$('#mobileTitlePage').append('<div class="mobileTitle">'+title+"</div>")
-		$('#mobileTitlePage').append('<div class="mobileSnippet"></div>')
+
+		$('#mobileTitlePage').append('<div class="mobileTitle">'+title+"</div>");
+		$('#mobileTitlePage').append('<div class="mobileSnippet"></div>');
 		if(subtitle)
-			$('.mobileSnippet').html(subtitle)
-		
+			$('.mobileSnippet').html(subtitle);
+
 		_map = response.map;
-		  
+
 		dojo.connect(_map, 'onExtentChange', refreshList);
 
-		// click action on the map where there's no graphic 
+		// click action on the map where there's no graphic
 		// causes a deselect.
 
 		dojo.connect(_map, 'onClick', function(event){
@@ -202,13 +237,13 @@ function init() {
 			$('#mobileTitlePage').css('display', 'none');
 			hideBookmarks();
 		});
-		
+
 		dojo.connect(_map, 'onZoomEnd', function(){
 			var level = _map.getLevel();
 			if (level > -1 && level === _map.getMaxZoom()) {
 				$('#zoomIn').addClass('disableControls');
 			}
-			else 
+			else
 				if (level > -1 && level === _map.getMinZoom()) {
 					$('#zoomOut').addClass('disableControls');
 				}
@@ -217,7 +252,7 @@ function init() {
 					$('#zoomOut').removeClass('disableControls');
 				}
 		})
-		
+
 		_bookmarks = response.itemInfo.itemData.bookmarks;
 		if (_bookmarks) {
 			loadBookmarks();
@@ -225,9 +260,9 @@ function init() {
 			$("#mobileBookmarksCon").show();
 			handleWindowResize(); // additional call to re-size tab bar
 		}
-		
-		var layers = response.itemInfo.itemData.operationalLayers; 
-		
+
+		var layers = response.itemInfo.itemData.operationalLayers;
+
 		if(_map.loaded){
 			initMap(layers);
 		} else {
@@ -235,27 +270,27 @@ function init() {
 				initMap(layers);
 			});
 		}
-		
+
 	});
-	
+
 	mapDeferred.addErrback(function(error) {
 	  console.log("Map creation failed: ", dojo.toJson(error));
 	});
-	
+
 	dojo.connect(dojo.byId('returnIcon'), 'onclick', showMobileList);
-	
+
 	dojo.connect(dojo.byId('returnHiddenBar'), 'onclick', showMobileList);
-	
+
 	dojo.connect(dojo.byId('centerMapIconContainer'), 'onclick', centerMapOnFeature);
-	
+
 	dojo.connect(dojo.byId('locateButton'), 'onclick', getDeviceLocation);
-	
+
 	$(document).on("click", function(src) {
 		if(src.target.id != 'bitlyIcon' && src.target.id != 'bitlyContent' && src.target.id != 'bitlyInput' ){
-			 $(".popover").hide(); 
+			 $(".popover").hide();
 		}
 	});
-	
+
 	$('#navThemeRight').on('click', function(){
 		_mobileThemeSwiper.swipeNext()
 	})
@@ -265,14 +300,14 @@ function init() {
 	$('#mobileThemeBar').on('click', function(){
 		hideBookmarks();
 	})
-	
+
 	_mobileThemeSwiper = new Swiper('#mobileThemeBar .swiper-container',{
 		mode:'horizontal',
 		onSlideChangeEnd : function(){
 			activateLayer(_contentLayers[_mobileThemeSwiper.activeLoopIndex]);
 		}
 	});
-	
+
 	_mobileFeatureSwiper = new Swiper('#mobileFeature .swiper-container',{
 		mode:'horizontal',
 		keyboardControl: true,
@@ -290,7 +325,7 @@ function init() {
 				loopFeatureSlides('right')
 			}
 		}
-	});   
+	});
 	if(GEOLOCATOR == 'true' || GEOLOCATOR == true)
 		$('#locateButton').css('display', 'block');
 }
@@ -715,14 +750,15 @@ function refreshList() {
 		}		
 	});
 	
-	$('#mobilePaneList').scrollTop(0)
+	$('#mobilePaneList').scrollTop(0);
 
 	if(!visibleFeatures)
-		$('.noFeature').css('display', 'block')
+		$('.noFeature').css('display', 'block');
 	else
-		$('.noFeature').css('display', 'none')
+		$('.noFeature').css('display', 'none');
 }
 
+// 创建图片图层
 function buildLayer(arr,iconDir,root) {
 	var layer = new esri.layers.GraphicsLayer();
 	var pt;
@@ -1378,6 +1414,7 @@ function displayLocationPin(point)
 	}, 10000);
 }
 
+// 分享到Facebook
 function shareFacebook()
 {
 	var options = '&p[title]=' + encodeURIComponent($('#title').text())
@@ -1392,6 +1429,7 @@ function shareFacebook()
 	);
 }
 
+// 分享到Twitter
 function shareTwitter()
 {
 	var options = 'text=' + encodeURIComponent($('#title').text())
